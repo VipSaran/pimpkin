@@ -5,7 +5,8 @@ var gpio = require("pi-gpio");
 var gpioPin1 = 18; // header pin 18 = GPIO port 24
 var gpioPin2 = 22; // header pin 22 = GPIO port 25
 
-var numBlinks = 15;
+var soundOrderRandom = false;
+
 var interval = 100; // blinking interval (in ms)
 var intervalId;
 var pause = 5000; // delay (in ms) between consecutive scareThem (after the sound has finished)
@@ -73,7 +74,7 @@ function getSoundFileName(random, callback) {
 var playSound = function(callback) {
   // var soundFileName = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
 
-  getSoundFileName(false, function(soundFileName) {
+  getSoundFileName(soundOrder, function(soundFileName) {
     var command = 'omxplayer sounds/' + soundFileName;
     execute(command, function(out, err) {
       if (err) {
