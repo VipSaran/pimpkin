@@ -1,4 +1,3 @@
-=======
 Pimpkin
 =======
 
@@ -8,7 +7,7 @@ Primary application: to make a Halloween pumpkin scarier! >:>
 [![ScreenShot](https://raw.github.com/VipSaran/pumpkin/master/screenshot.png)](http://youtu.be/vt5fpE0bzSY)
 
 Getting started
-================
+===============
 Get the code
 ------------
 
@@ -43,7 +42,7 @@ My Pi had a really low audio output volume when I started testing the sound file
     alsamixer
 
 All configured now?
-------------------
+-------------------
 Run the app:
 
     node blink.js
