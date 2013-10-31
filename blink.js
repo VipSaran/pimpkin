@@ -10,15 +10,15 @@ var interval = 100; // interval in ms
 var intervalId;
 var pause = 10000;
 var pauseId;
-var duration = 30000; // duration in ms
+var duration = 300000; // duration in ms
 var durationId;
 
 function execute(command, callback) {
   exec(command, function(error, stdout, stderr) {
-    console.log("  command: ", command);
-    console.log("  error: ", error);
-    console.log("  stdout: ", stdout);
-    console.log("  stderr: ", stderr);
+    // console.log("  command: ", command);
+    // console.log("  error: ", error);
+    // console.log("  stdout: ", stdout);
+    // console.log("  stderr: ", stderr);
     callback(stdout, stderr);
   });
 }
@@ -36,15 +36,52 @@ function exitGracefully() {
   });
 }
 
-var playSound = function(soundFileName, callback) {
-  var command = 'omxplayer sounds/' + soundFileName;
-  execute(command, function(out, err) {
-    if (err) {
-      console.error(err);
+function randomFromInterval(from, to) {
+  return Math.floor(Math.random() * (to - from + 1) + from);
+}
+
+var lastFileNameIndex = 0;
+
+function getSoundFileName(random, callback) {
+  console.log('getSoundFileName(); random=', random);
+
+  fs.readdir('sounds', function(err, list) {
+    if (err) return done(err);
+
+    var index = 0;
+    if (random) {
+      index = randomFromInterval(0, list.length - 1);
     } else {
-      console.log('played:', soundFileName);
+      index = lastFileNameIndex;
+
+      lastFileNameIndex++;
+
+      // loop
+      if (lastFileNameIndex == list.length) {
+        lastFileNameIndex = 0;
+      }
     }
-    callback();
+
+    var fileName = list[index];
+    console.log('index=', index);
+    console.log('fileName=', fileName);
+    callback(fileName);
+  });
+};
+
+var playSound = function(callback) {
+  // var soundFileName = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
+
+  getSoundFileName(true, function(soundFileName) {
+    var command = 'omxplayer sounds/' + soundFileName;
+    execute(command, function(out, err) {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('played:', soundFileName);
+      }
+      callback();
+    });
   });
 };
 
@@ -64,10 +101,8 @@ gpio.open(gpioPin1, "output", function(err) {
 });
 
 var scareThem = function() {
-  var soundFileName = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
-
   startBlinker();
-  playSound(soundFileName, stopBlinker);
+  playSound(stopBlinker);
 };
 
 var startBlinker = function() {
