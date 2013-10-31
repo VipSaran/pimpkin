@@ -2,8 +2,10 @@ var fs = require('fs');
 var exec = require('child_process').exec;
 var gpio = require("pi-gpio");
 
-var gpioPin1 = 18; // header pin 18 = GPIO port 24
-var gpioPin2 = 22; // header pin 22 = GPIO port 25
+var gpioPin1 = 22; // header pin 22 = GPIO port 25
+var gpioPin2 = 18; // header pin 18 = GPIO port 24
+var gpioPin3 = 16; // header pin 22 = GPIO port 23
+var gpioPin4 = 15; // header pin 22 = GPIO port 22
 
 var numBlinks = 15;
 var interval = 100; // blinking interval (in ms)
@@ -31,7 +33,15 @@ function exitGracefully() {
     gpio.write(gpioPin2, 0, function() {
       gpio.close(gpioPin2);
       console.log('Closed the GPIO pin ' + gpioPin2);
-      process.exit(0); // and terminate the program
+      gpio.write(gpioPin3, 0, function() {
+        gpio.close(gpioPin3);
+        console.log('Closed the GPIO pin ' + gpioPin3);
+        gpio.write(gpioPin4, 0, function() {
+          gpio.close(gpioPin4);
+          console.log('Closed the GPIO pin ' + gpioPin4);
+          process.exit(0); // and terminate the program
+        });
+      });
     });
   });
 }
@@ -88,6 +98,8 @@ var playSound = function(callback) {
 
 gpio.close(gpioPin1);
 gpio.close(gpioPin2);
+gpio.close(gpioPin3);
+gpio.close(gpioPin4);
 
 var nextValue = 0;
 var blinkCounter = 0;
@@ -96,7 +108,13 @@ gpio.open(gpioPin1, "output", function(err) {
   console.log('Opened the GPIO pin ' + gpioPin1);
   gpio.open(gpioPin2, "output", function(err) {
     console.log('Opened the GPIO pin ' + gpioPin2);
-    scareThem();
+    gpio.open(gpioPin3, "output", function(err) {
+      console.log('Opened the GPIO pin ' + gpioPin3);
+      gpio.open(gpioPin4, "output", function(err) {
+        console.log('Opened the GPIO pin ' + gpioPin4);
+        scareThem();
+      });
+    });
   });
 });
 
@@ -119,6 +137,12 @@ var startBlinker = function() {
     gpio.write(gpioPin2, nextValue, function(err) {
       if (err) throw err;
     });
+    gpio.write(gpioPin3, nextValue, function(err) {
+      if (err) throw err;
+    });
+    gpio.write(gpioPin4, nextValue, function(err) {
+      if (err) throw err;
+    });
   }, interval);
 };
 
@@ -129,6 +153,12 @@ var stopBlinker = function() {
     if (err) throw err;
   });
   gpio.write(gpioPin2, 0, function(err) {
+    if (err) throw err;
+  });
+  gpio.write(gpioPin3, 0, function(err) {
+    if (err) throw err;
+  });
+  gpio.write(gpioPin4, 0, function(err) {
     if (err) throw err;
   });
 };
