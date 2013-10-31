@@ -74,7 +74,7 @@ function getSoundFileName(random, callback) {
 var playSound = function(callback) {
   // var soundFileName = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
 
-  getSoundFileName(soundOrder, function(soundFileName) {
+  getSoundFileName(soundOrderRandom, function(soundFileName) {
     var command = 'omxplayer sounds/' + soundFileName;
     execute(command, function(out, err) {
       if (err) {
