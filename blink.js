@@ -23,18 +23,6 @@ function execute(command, callback) {
   });
 }
 
-var playSound = function() {
-  var soundFile = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
-  var command = 'omxplayer sounds/' + soundFile;
-  execute(command, function(out, err) {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log('played:', soundFile);
-    }
-  });
-}
-
 function exitGracefully() {
   // turn off pin 11
   gpio.write(gpioPin1, 0, function() {
@@ -48,6 +36,18 @@ function exitGracefully() {
   });
 }
 
+var playSound = function(soundFileName, callback) {
+  var command = 'omxplayer sounds/' + soundFileName;
+  execute(command, function(out, err) {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log('played:', soundFileName);
+    }
+    callback();
+  });
+};
+
 gpio.close(gpioPin1);
 gpio.close(gpioPin2);
 
@@ -58,41 +58,41 @@ gpio.open(gpioPin1, "output", function(err) {
   console.log('Opened the GPIO pin ' + gpioPin1);
   gpio.open(gpioPin2, "output", function(err) {
     console.log('Opened the GPIO pin ' + gpioPin2);
-    blinker();
-    pauseId = setInterval(blinker, pause);
+    scareThem();
+    pauseId = setInterval(scareThem, pause);
   });
 });
 
-var blinker = function() {
-  playSound();
-  
-  intervalId = setInterval(function() {   
-    blinkCounter++;
-    // console.log('blinkCounter=', blinkCounter);
-    if (blinkCounter < numBlinks) {
-      nextValue = (nextValue + 1) % 2;
-      // console.log('nextValue=', nextValue);
+var scareThem = function() {
+  var soundFileName = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
 
-      gpio.write(gpioPin1, nextValue, function(err) {
-        if (err) throw err;
-      });
-      gpio.write(gpioPin2, nextValue, function(err) {
-        if (err) throw err;
-      });
-    } else {
-      console.log(numBlinks + 'x fired LED. Waiting for ' + pause/1000 + 's.');
-      clearInterval(intervalId);
+  startBlinker();
+  playSound(soundFileName, stopBlinker);
+};
 
-      blinkCounter = 0;
-      
-      gpio.write(gpioPin1, 0, function(err) {
-        if (err) throw err;
-      });
-      gpio.write(gpioPin2, 0, function(err) {
-        if (err) throw err;
-      });      
-    }
+var startBlinker = function() {
+  intervalId = setInterval(function() {
+    nextValue = (nextValue + 1) % 2;
+    // console.log('nextValue=', nextValue);
+
+    gpio.write(gpioPin1, nextValue, function(err) {
+      if (err) throw err;
+    });
+    gpio.write(gpioPin2, nextValue, function(err) {
+      if (err) throw err;
+    });
   }, interval);
+};
+
+var stopBlinker = function() {
+  clearInterval(intervalId);
+
+  gpio.write(gpioPin1, 0, function(err) {
+    if (err) throw err;
+  });
+  gpio.write(gpioPin2, 0, function(err) {
+    if (err) throw err;
+  });
 };
 
 durationId = setTimeout(function() {
