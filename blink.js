@@ -6,11 +6,11 @@ var gpioPin1 = 18; // header pin 18 = GPIO port 24
 var gpioPin2 = 22; // header pin 22 = GPIO port 25
 
 var numBlinks = 15;
-var interval = 100; // interval in ms
+var interval = 100; // blinking interval (in ms)
 var intervalId;
-var pause = 10000;
+var pause = 5000; // delay (in ms) between consecutive scareThem (after the sound has finished)
 var pauseId;
-var duration = 300000; // duration in ms
+var duration = 300000; // duration of the "show" (in ms)
 var durationId;
 
 function execute(command, callback) {
@@ -45,6 +45,7 @@ var lastFileNameIndex = 0;
 function getSoundFileName(random, callback) {
   console.log('getSoundFileName(); random=', random);
 
+  // read dir each time for better robustness
   fs.readdir('sounds', function(err, list) {
     if (err) return done(err);
 
@@ -72,7 +73,7 @@ function getSoundFileName(random, callback) {
 var playSound = function(callback) {
   // var soundFileName = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
 
-  getSoundFileName(true, function(soundFileName) {
+  getSoundFileName(false, function(soundFileName) {
     var command = 'omxplayer sounds/' + soundFileName;
     execute(command, function(out, err) {
       if (err) {
@@ -96,13 +97,15 @@ gpio.open(gpioPin1, "output", function(err) {
   gpio.open(gpioPin2, "output", function(err) {
     console.log('Opened the GPIO pin ' + gpioPin2);
     scareThem();
-    pauseId = setInterval(scareThem, pause);
   });
 });
 
 var scareThem = function() {
   startBlinker();
-  playSound(stopBlinker);
+  playSound(function() {
+    stopBlinker();
+    pauseId = setTimeout(scareThem, pause);
+  });
 };
 
 var startBlinker = function() {
@@ -132,7 +135,7 @@ var stopBlinker = function() {
 
 durationId = setTimeout(function() {
   clearInterval(intervalId);
-  clearInterval(pauseId);
+  clearTimeout(pauseId);
   clearTimeout(durationId);
 
   exitGracefully();
