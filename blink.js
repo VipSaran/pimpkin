@@ -1,3 +1,5 @@
+var fs = require('fs');
+var exec = require('child_process').exec;
 var gpio = require("pi-gpio");
 
 var gpioPin1 = 18; // header pin 18 = GPIO port 24
@@ -10,6 +12,28 @@ var pause = 10000;
 var pauseId;
 var duration = 30000; // duration in ms
 var durationId;
+
+function execute(command, callback) {
+  exec(command, function(error, stdout, stderr) {
+    console.log("  command: ", command);
+    console.log("  error: ", error);
+    console.log("  stdout: ", stdout);
+    console.log("  stderr: ", stderr);
+    callback(stdout, stderr);
+  });
+}
+
+var playSound = function() {
+  var soundFile = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
+  var command = 'omxplayer sounds/' + soundFile;
+  execute(command, function(out, err) {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log('played:', soundFile);
+    }
+  });
+}
 
 function exitGracefully() {
   // turn off pin 11
@@ -40,7 +64,9 @@ gpio.open(gpioPin1, "output", function(err) {
 });
 
 var blinker = function() {
-  intervalId = setInterval(function() {
+  playSound();
+  
+  intervalId = setInterval(function() {   
     blinkCounter++;
     // console.log('blinkCounter=', blinkCounter);
     if (blinkCounter < numBlinks) {
