@@ -143,5 +143,9 @@ durationId = setTimeout(function() {
 
 process.on('SIGINT', function() {
   console.log('About to exit.');
+  clearInterval(intervalId);
+  clearTimeout(pauseId);
+  clearTimeout(durationId);
+  
   exitGracefully();
 });
