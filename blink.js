@@ -3,10 +3,12 @@ var gpio = require("pi-gpio");
 var gpioPin1 = 18; // header pin 18 = GPIO port 24
 var gpioPin2 = 22; // header pin 22 = GPIO port 25
 
-
-var interval = 150; // interval in ms
+var numBlinks = 15;
+var interval = 100; // interval in ms
 var intervalId;
-var duration = 200000; // duration in ms
+var pause = 10000;
+var pauseId;
+var duration = 30000; // duration in ms
 var durationId;
 
 function exitGracefully() {
@@ -25,45 +27,51 @@ function exitGracefully() {
 gpio.close(gpioPin1);
 gpio.close(gpioPin2);
 
-var next = 0;
-var counter = 0;
+var nextValue = 0;
+var blinkCounter = 0;
 
-// open pin for output
 gpio.open(gpioPin1, "output", function(err) {
+  console.log('Opened the GPIO pin ' + gpioPin1);
   gpio.open(gpioPin2, "output", function(err) {
-
-    intervalId = setInterval(function() {
-      counter++;
-      console.log('counter=', counter);
-      if (counter < 20) {
-        next = (next + 1) % 2;
-        gpio.write(gpioPin1, next, function(err) {
-          if (err) throw err;
-          // console.log('gpioPin1=', next);
-        });
-        gpio.write(gpioPin2, next, function(err) {
-          if (err) throw err;
-          // console.log('gpioPin2=', next);
-        });
-      } else if (counter > 100) {
-        counter = 0;
-      } else {
-        gpio.write(gpioPin1, 0, function(err) {
-          if (err) throw err;
-          // console.log('gpioPin1=', next);
-        });
-        gpio.write(gpioPin2, 0, function(err) {
-          if (err) throw err;
-          // console.log('gpioPin2=', next);
-        });
-      }
-    }, interval);
+    console.log('Opened the GPIO pin ' + gpioPin2);
+    blinker();
+    pauseId = setInterval(blinker, pause);
   });
 });
 
+var blinker = function() {
+  intervalId = setInterval(function() {
+    blinkCounter++;
+    // console.log('blinkCounter=', blinkCounter);
+    if (blinkCounter < numBlinks) {
+      nextValue = (nextValue + 1) % 2;
+      // console.log('nextValue=', nextValue);
+
+      gpio.write(gpioPin1, nextValue, function(err) {
+        if (err) throw err;
+      });
+      gpio.write(gpioPin2, nextValue, function(err) {
+        if (err) throw err;
+      });
+    } else {
+      console.log(numBlinks + 'x fired LED. Waiting for ' + pause/1000 + 's.');
+      clearInterval(intervalId);
+
+      blinkCounter = 0;
+      
+      gpio.write(gpioPin1, 0, function(err) {
+        if (err) throw err;
+      });
+      gpio.write(gpioPin2, 0, function(err) {
+        if (err) throw err;
+      });      
+    }
+  }, interval);
+};
 
 durationId = setTimeout(function() {
   clearInterval(intervalId);
+  clearInterval(pauseId);
   clearTimeout(durationId);
 
   exitGracefully();
