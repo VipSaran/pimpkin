@@ -5,14 +5,11 @@ var gpio = require("pi-gpio");
 var gpioPin1 = 18; // header pin 18 = GPIO port 24
 var gpioPin2 = 22; // header pin 22 = GPIO port 25
 
-var soundOrderRandom = false;
+var soundOrderRandom = true;
 
 var interval = 100; // blinking interval (in ms)
 var intervalId;
-var pause = 5000; // delay (in ms) between consecutive scareThem (after the sound has finished)
 var pauseId;
-var duration = 300000; // duration of the "show" (in ms)
-var durationId;
 
 function execute(command, callback) {
   exec(command, function(error, stdout, stderr) {
@@ -24,15 +21,17 @@ function execute(command, callback) {
   });
 }
 
-function exitGracefully() {
-  // turn off pin 11
+function exitGracefully(callback) {
+  clearInterval(intervalId);
+  clearTimeout(pauseId);
+
   gpio.write(gpioPin1, 0, function() {
     gpio.close(gpioPin1);
     console.log('Closed the GPIO pin ' + gpioPin1);
     gpio.write(gpioPin2, 0, function() {
       gpio.close(gpioPin2);
       console.log('Closed the GPIO pin ' + gpioPin2);
-      process.exit(0); // and terminate the program
+      callback();
     });
   });
 }
@@ -93,20 +92,31 @@ gpio.close(gpioPin2);
 var nextValue = 0;
 var blinkCounter = 0;
 
-gpio.open(gpioPin1, "output", function(err) {
-  console.log('Opened the GPIO pin ' + gpioPin1);
-  gpio.open(gpioPin2, "output", function(err) {
-    console.log('Opened the GPIO pin ' + gpioPin2);
-    scareThem();
+var init = function(callback) {
+  gpio.open(gpioPin1, "output", function(err) {
+    console.log('Opened the GPIO pin ' + gpioPin1);
+    gpio.open(gpioPin2, "output", function(err) {
+      console.log('Opened the GPIO pin ' + gpioPin2);
+      callback();
+    });
   });
-});
+};
 
-var scareThem = function() {
+var scareThem = function(pause) {
   startBlinker();
   playSound(function() {
     stopBlinker();
-    pauseId = setTimeout(scareThem, pause);
+    if (pause !== "undefined" && pause != null) {
+      console.log('starting indefinite play with', pause, 'delay');
+      pauseId = setTimeout(function() {
+        scareThem(pause);
+      }, pause);
+    }
   });
+};
+
+var stopPeriodicScare = function() {
+  clearTimeout(pauseId);
 };
 
 var startBlinker = function() {
@@ -134,19 +144,8 @@ var stopBlinker = function() {
   });
 };
 
-durationId = setTimeout(function() {
-  clearInterval(intervalId);
-  clearTimeout(pauseId);
-  clearTimeout(durationId);
 
-  exitGracefully();
-}, duration);
-
-process.on('SIGINT', function() {
-  console.log('About to exit.');
-  clearInterval(intervalId);
-  clearTimeout(pauseId);
-  clearTimeout(durationId);
-  
-  exitGracefully();
-});
+exports.init = init;
+exports.scareThem = scareThem;
+exports.stopPeriodicScare = stopPeriodicScare;
+exports.exitGracefully = exitGracefully;
