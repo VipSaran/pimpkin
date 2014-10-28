@@ -13,8 +13,8 @@ Get the code
 
 Clone the repo:
 
-    git clone https://github.com/VipSaran/pumpkin.git
-    cd pumpkin
+    git clone https://github.com/VipSaran/pimpkin.git
+    cd pimpkin
 
 
 Things to configure (in `blink.js`)
