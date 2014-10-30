@@ -4,7 +4,7 @@ Pimpkin
 Node.js app (along with some suplementary sound files) to control few LEDs and play said sound files.
 Primary application: to make a Halloween pumpkin scarier! >:>
 
-[![ScreenShot](https://raw.github.com/VipSaran/pimpkin/master/screenshot.png)](http://youtu.be/vt5fpE0bzSY)
+[![ScreenShot](https://raw.github.com/VipSaran/pimpkin/master/screenshot.png)](http://youtu.be/_lgX4hxKVRc)
 
 Getting started
 ===============
@@ -13,8 +13,8 @@ Get the code
 
 Clone the repo:
 
-    git clone https://github.com/VipSaran/pumpkin.git
-    cd pumpkin
+    git clone https://github.com/VipSaran/pimpkin.git
+    cd pimpkin
 
 
 Things to configure (in `blink.js`)
