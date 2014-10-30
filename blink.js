@@ -50,26 +50,67 @@ function getSoundFileName(random, callback) {
   });
 };
 
+function getSoundFileDuration(soundFileName, callback) {
+  var command = "omxplayer -i sounds/" + soundFileName;
+  console.log('command=', command);
+  execute(command, function(out, err) {
+    console.log('out=', out);
+    var seconds = 5;
+    if (err) {
+      console.error(err);
+      return callback(seconds);
+    } else {
+      console.log('length:', out);
+
+      command = "sed -n 's/.*Duration: //;s/, start:.*//p' " + out;
+      execute(command, function(out, err) {
+        console.log('out=', out);
+        try {
+          var tmp = '1970-01-01T' + out + 'Z';
+          var millis = Date.parse(tmp);
+          seconds = millis / 1000;
+        } catch (e) {
+          console.error(e);
+        }
+
+        return callback(seconds);
+      });
+    }
+  });
+}
+
 var playSound = function(callback) {
+  console.log('playSound()');
+
   // var soundFileName = 'Evil_laugh_Male_9-Himan-1598312646.mp3';
 
   getSoundFileName(soundOrderRandom, function(soundFileName) {
-    var command = 'omxplayer sounds/' + soundFileName;
-    execute(command, function(out, err) {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log('played:', soundFileName);
-      }
-      callback();
+    getSoundFileDuration(soundFileName, function(seconds) {
+      console.log('seconds=', seconds);
+
+      lightUp(seconds);
+
+      var command = 'omxplayer sounds/' + soundFileName;
+      execute(command, function(out, err) {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log('played:', soundFileName);
+        }
+        callback();
+      });
     });
   });
 };
 
 var lightUp = function(seconds) {
+  console.log('lightUp()');
+
   var options = {
-    host: 'http://192.168.2.115:3000',
-    path: '/api/light/' + seconds
+    host: '192.168.2.115',
+    port: '3000',
+    path: '/api/light/' + seconds,
+    method: 'GET'
   };
 
   var callback = function(response) {
@@ -88,7 +129,8 @@ var lightUp = function(seconds) {
 };
 
 var scareThem = function(pause) {
-  lightUp(10);
+  console.log('scareThem()');
+
   playSound(function() {
     if (pause !== "undefined" && pause != null) {
       console.log('starting indefinite play with', pause, 'delay');
@@ -103,7 +145,5 @@ var stopPeriodicScare = function() {
   clearTimeout(pauseId);
 };
 
-exports.init = init;
 exports.scareThem = scareThem;
 exports.stopPeriodicScare = stopPeriodicScare;
-exports.exitGracefully = exitGracefully;

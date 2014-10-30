@@ -6,10 +6,6 @@ var app = express();
 app.configure(function() {
   app.use(express.favicon());
   app.use(express['static'](__dirname + '/'));
-
-  blink.init(function() {
-    // blink.scareThem();
-  });
 });
 
 app.get('/scare', function(req, res) {
@@ -35,11 +31,3 @@ app.use(function(err, req, res, next) {
 
 app.listen(3030);
 console.log('App Server running at port 3030');
-
-process.on('SIGINT', function() {
-  console.log('About to exit.');
-
-  blink.exitGracefully(function() {
-    process.exit(0); // and terminate the program
-  });
-});
