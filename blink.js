@@ -1,14 +1,9 @@
 var fs = require('fs');
 var exec = require('child_process').exec;
-var gpio = require("pi-gpio");
-
-var gpioPin1 = 18; // header pin 18 = GPIO port 24
-var gpioPin2 = 22; // header pin 22 = GPIO port 25
+var http = require('http');
 
 var soundOrderRandom = true;
 
-var interval = 100; // blinking interval (in ms)
-var intervalId;
 var pauseId;
 
 function execute(command, callback) {
@@ -18,21 +13,6 @@ function execute(command, callback) {
     // console.log("  stdout: ", stdout);
     // console.log("  stderr: ", stderr);
     callback(stdout, stderr);
-  });
-}
-
-function exitGracefully(callback) {
-  clearInterval(intervalId);
-  clearTimeout(pauseId);
-
-  gpio.write(gpioPin1, 0, function() {
-    gpio.close(gpioPin1);
-    console.log('Closed the GPIO pin ' + gpioPin1);
-    gpio.write(gpioPin2, 0, function() {
-      gpio.close(gpioPin2);
-      console.log('Closed the GPIO pin ' + gpioPin2);
-      callback();
-    });
   });
 }
 
@@ -86,26 +66,30 @@ var playSound = function(callback) {
   });
 };
 
-gpio.close(gpioPin1);
-gpio.close(gpioPin2);
+var lightUp = function(seconds) {
+  var options = {
+    host: 'http://192.168.2.115:3000',
+    path: '/api/light/' + seconds
+  };
 
-var nextValue = 0;
-var blinkCounter = 0;
+  var callback = function(response) {
+    var str = '';
 
-var init = function(callback) {
-  gpio.open(gpioPin1, "output", function(err) {
-    console.log('Opened the GPIO pin ' + gpioPin1);
-    gpio.open(gpioPin2, "output", function(err) {
-      console.log('Opened the GPIO pin ' + gpioPin2);
-      callback();
+    response.on('data', function(chunk) {
+      str += chunk;
     });
-  });
+
+    response.on('end', function() {
+      console.log(str);
+    });
+  }
+
+  http.request(options, callback).end();
 };
 
 var scareThem = function(pause) {
-  startBlinker();
+  lightUp(10);
   playSound(function() {
-    stopBlinker();
     if (pause !== "undefined" && pause != null) {
       console.log('starting indefinite play with', pause, 'delay');
       pauseId = setTimeout(function() {
@@ -118,32 +102,6 @@ var scareThem = function(pause) {
 var stopPeriodicScare = function() {
   clearTimeout(pauseId);
 };
-
-var startBlinker = function() {
-  intervalId = setInterval(function() {
-    nextValue = (nextValue + 1) % 2;
-    // console.log('nextValue=', nextValue);
-
-    gpio.write(gpioPin1, nextValue, function(err) {
-      if (err) throw err;
-    });
-    gpio.write(gpioPin2, nextValue, function(err) {
-      if (err) throw err;
-    });
-  }, interval);
-};
-
-var stopBlinker = function() {
-  clearInterval(intervalId);
-
-  gpio.write(gpioPin1, 0, function(err) {
-    if (err) throw err;
-  });
-  gpio.write(gpioPin2, 0, function(err) {
-    if (err) throw err;
-  });
-};
-
 
 exports.init = init;
 exports.scareThem = scareThem;
