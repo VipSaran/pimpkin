@@ -61,12 +61,14 @@ function getSoundFileDuration(soundFileName, callback) {
     } else {
       console.log('length:', out);
       try {
+        out = out.substring(0, out.indexOf('.'));
+        console.log('out=', out);
         var tmp = '1970-01-01T' + out + 'Z';
-console.log('tmp=', tmp);
+        console.log('tmp=', tmp);
         var millis = Date.parse(tmp);
-console.log('millis=', millis);
+        console.log('millis=', millis);
         seconds = millis / 1000;
-console.log('seconds=', seconds);
+        console.log('seconds=', seconds);
       } catch (e) {
         console.error(e);
       }
