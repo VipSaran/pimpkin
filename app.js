@@ -20,13 +20,13 @@ app.get('/scare', function(req, res) {
 
 // Express route for any other unrecognised incoming requests
 app.get('*', function(req, res) {
-  res.send('Unrecognised API call', 404);
+  res.status(404).send('Unrecognised API call');
 });
 
 // Express route to handle errors
 app.use(function(err, req, res, next) {
   if (req.xhr) {
-    res.send(500, 'Oops, Something went wrong!');
+    res.status(500).send('Oops, Something went wrong!');
   } else {
     next(err);
   }
