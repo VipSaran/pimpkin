@@ -1,18 +1,21 @@
 var express = require('express');
+var bodyParser = require('body-parser');
+
 var blink = require('./blink');
 
 var app = express();
 
-app.configure(function() {
-  app.use(express.favicon());
-  app.use(express['static'](__dirname + '/'));
-});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
+app.use(express.static(__dirname + '/'));
 
 app.get('/scare', function(req, res) {
   console.log('/scare');
 
   blink.scareThem();
-  res.send(true);
+  res.status(200).send(true);
 });
 
 // Express route for any other unrecognised incoming requests
