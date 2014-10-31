@@ -8,10 +8,10 @@ var pauseId;
 
 function execute(command, callback) {
   exec(command, function(error, stdout, stderr) {
-    // console.log("  command: ", command);
-    // console.log("  error: ", error);
-    // console.log("  stdout: ", stdout);
-    // console.log("  stderr: ", stderr);
+    console.log("  command: ", command);
+    console.log("  error: ", error);
+    console.log("  stdout: ", stdout);
+    console.log("  stderr: ", stderr);
     callback(stdout, stderr);
   });
 }
@@ -51,7 +51,7 @@ function getSoundFileName(random, callback) {
 };
 
 function getSoundFileDuration(soundFileName, callback) {
-  var command = "omxplayer -i sounds/" + soundFileName;
+  var command = "omxplayer -i sounds/" + soundFileName + " 2>&1 | sed -n 's/.*Duration: //;s/, start:.*//p'";
   console.log('command=', command);
   execute(command, function(out, err) {
     console.log('out=', out);
@@ -61,20 +61,14 @@ function getSoundFileDuration(soundFileName, callback) {
       return callback(seconds);
     } else {
       console.log('length:', out);
-
-      command = "sed -n 's/.*Duration: //;s/, start:.*//p' " + out;
-      execute(command, function(out, err) {
-        console.log('out=', out);
-        try {
-          var tmp = '1970-01-01T' + out + 'Z';
-          var millis = Date.parse(tmp);
-          seconds = millis / 1000;
-        } catch (e) {
-          console.error(e);
-        }
-
-        return callback(seconds);
-      });
+      try {
+        var tmp = '1970-01-01T' + out + 'Z';
+        var millis = Date.parse(tmp);
+        seconds = millis / 1000;
+      } catch (e) {
+        console.error(e);
+      }
+      return callback(seconds);
     }
   });
 }
