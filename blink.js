@@ -54,7 +54,6 @@ function getSoundFileDuration(soundFileName, callback) {
   var command = "omxplayer -i sounds/" + soundFileName + " 2>&1 | sed -n 's/.*Duration: //;s/, start:.*//p'";
   console.log('command=', command);
   execute(command, function(out, err) {
-    console.log('out=', out);
     var seconds = 5;
     if (err) {
       console.error(err);
@@ -63,8 +62,11 @@ function getSoundFileDuration(soundFileName, callback) {
       console.log('length:', out);
       try {
         var tmp = '1970-01-01T' + out + 'Z';
+console.log('tmp=', tmp);
         var millis = Date.parse(tmp);
+console.log('millis=', millis);
         seconds = millis / 1000;
+console.log('seconds=', seconds);
       } catch (e) {
         console.error(e);
       }
