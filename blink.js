@@ -88,7 +88,7 @@ var playSound = function(callback) {
 
       lightUp(seconds);
 
-      var command = 'omxplayer sounds/' + soundFileName;
+      var command = 'omxplayer -o hdmi sounds/' + soundFileName;
       execute(command, function(out, err) {
         if (err) {
           console.error(err);
