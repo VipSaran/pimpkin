@@ -15,7 +15,17 @@ Clone the repo:
 
     git clone https://github.com/VipSaran/pimpkin.git
     cd pimpkin
+    npm install
+    node app.js
 
+Dependencies
+------------
+
+*omxplayer*
+
+    sudo apt-get install fonts-freefont-ttf
+    wget http://omxplayer.sconde.net/builds/omxplayer_0.3.5~git20140923~6ee9a0a_armhf.deb
+    sudo dpkg -i omxplayer_0.3.5~git20140923~6ee9a0a_armhf.deb
 
 Things to configure (in `blink.js`)
 -----------------------------------

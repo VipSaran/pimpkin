@@ -123,7 +123,13 @@ var lightUp = function(seconds) {
     });
   }
 
-  http.request(options, callback).end();
+  var req = http.request(options, callback);
+
+  req.on('error', function(err) {
+    console.error('error executing request', err);
+  });
+
+  req.end();
 };
 
 var scareThem = function(pause) {
