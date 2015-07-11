@@ -1,15 +1,28 @@
-Pimpkin
-=======
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Pimpkin](#pimpkin)
+  - [Getting started](#getting-started)
+    - [Get the code](#get-the-code)
+    - [Things to configure (in `blink.js`)](#things-to-configure-in-blinkjs)
+    - [Volume on Pi](#volume-on-pi)
+    - [All configured now?](#all-configured-now)
+    - [Need more details!](#need-more-details)
+  - [Resources used](#resources-used)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Pimpkin
 
 Node.js app (along with some suplementary sound files) to control few LEDs and play said sound files.
 Primary application: to make a Halloween pumpkin scarier! >:>
 
-[![ScreenShot](https://raw.github.com/VipSaran/pimpkin/master/screenshot.png)](http://youtu.be/_lgX4hxKVRc)
+[![ScreenShot](screenshot.png?raw=true)](http://youtu.be/_lgX4hxKVRc)
 
-Getting started
-===============
-Get the code
-------------
+## Getting started
+
+### Get the code
 
 Clone the repo:
 
@@ -27,8 +40,7 @@ Dependencies
     wget http://omxplayer.sconde.net/builds/omxplayer_0.3.5~git20140923~6ee9a0a_armhf.deb
     sudo dpkg -i omxplayer_0.3.5~git20140923~6ee9a0a_armhf.deb
 
-Things to configure (in `blink.js`)
------------------------------------
+### Things to configure (in `blink.js`)
 
 GPIO pins used to control the LEDS:
 
@@ -45,25 +57,25 @@ Want to randomly play the sound files? Change the default:
 
     var soundOrderRandom = false;
 
-Volume on Pi
-------------
+### Volume on Pi
+
 My Pi had a really low audio output volume when I started testing the sound files. This is how you can easily configure it in shell:
 
     alsamixer
 
-All configured now?
--------------------
+### All configured now?
+
 Run the app:
 
     node blink.js
 
-Need more details!
-------------------
+### Need more details!
+
 Sorry. The code should speak for itself (and it should be a short speech).
 
 
-Resources used
-==============
+## Resources used
+
 * [Rasberry Pi | GPIO Examples 1 - A single LED | Gordons Projects][1]
 
 * [Raspberry Pi Command Line Audio | Raspberry Pi Spy][2]
