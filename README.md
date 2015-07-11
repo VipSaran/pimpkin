@@ -4,7 +4,7 @@ Pimpkin
 Node.js app (along with some suplementary sound files) to control few LEDs and play said sound files.
 Primary application: to make a Halloween pumpkin scarier! >:>
 
-[![ScreenShot](https://raw.github.com/VipSaran/pimpkin/master/screenshot.png)](http://youtu.be/_lgX4hxKVRc)
+[![ScreenShot](screenshot.png?raw=true)](http://youtu.be/_lgX4hxKVRc)
 
 Getting started
 ===============
